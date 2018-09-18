@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+  <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <title>购物车</title>
+</head>
+<body>
+  <div class="container" id='app'>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h4 class="paenl-title">参天大树的购物车清单</h4>
+      </div>
+      <table class="table table-hover" v-show = '!arr.length == 0'>
+        <tr>
+          <th>订单编号</th>
+          <th>店铺名称</th>
+          <th>产品名称</th>
+          <th class="text-center">购物数量</th>
+          <th>产品单价</th>
+          <th>小计</th>
+          <th>操作</th>
+        </tr>
+        <tr v-for = '(items, index) in arr'>
+          <td>{{index + 1}}</td>
+          <td>{{items.name}}</td>
+          <td>{{items.title}}</td>
+          <td>
+            <div class="input-group">
+              <span class="input-group-addon" @click = 'subStr(index)'>-</span>
+              <input type="text" v-model = 'items.amount' class="form-control" />
+              <span class="input-group-addon" @click = 'add(index)'>+</span>
+            </div>
+          </td>
+          <td>{{items.price}}</td>
+          <td>{{items.price * items.amount}}</td>
+          <td>
+            <button class='btn btn-warning' data-toggle = 'modal' data-target = '#example' @click = 'nowIndex = index'>移除</button>
+          </td>
+        </tr>
+        <tr>
+          <td>总计：</td>
+          <td colspan="5" class='text-right'>
+            <span>{{total}}</span>
+
+          </td>
+          <td>
+            <button class="btn btn-warning" data-toggle = 'modal' data-target = '#example' @click = 'nowIndex = -1'>清空购物车</button>
+          </td>
+        </tr>
+      </table>
+
+      <div class="alert alert-warning" v-if= 'arr.length == 0'>
+        <span>您的购物车空空如也~~</span>
+      </div>
+    </div>
+
+    <div role = 'dialog' class="modal fade in bs-example-modal-sm" id='example'>
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss = 'modal'><span>&times;</span></button>
+            <h4 class="modal-title">确认删除{{nowIndex == -1 ? '全部商品' : nowIndex + 1}}吗？</h4>
+          </div>
+          <div class="modal-body text-center">
+            <button class="btn btn-primary btn-sm" data-dismiss = 'modal'>取消</button>
+            <button class='btn btn-danger btn-sm' data-dismiss = 'modal' @click = 'removeRow(nowIndex)'>确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- v-if 是用于元素的显示与消除-->
+  <!-- v-show 用于元素的显示（display：block||inline-block）与隐藏（display：none）-->
+
+  <script type='text/javascript'>
+
+    new Vue({
+      el : '#app',
+      data : {
+        nowIndex : -10,
+        total : 0,
+        bestVal : 0,
+        arr : [
+          {
+            name : '牛先生料理店',
+            title : '肥牛',
+            price : 99,
+            amount : 10
+          },
+          {
+            name : 'Champion潮店',
+            title : '刺绣小标卫衣',
+            price : 299,
+            amount : 1
+          },
+          {
+            name : '新华书店',
+            title : '新华字典',
+            price : 49,
+            amount : 11
+          },
+          {
+            name : '小米',
+            title : 'xiaomi MIX 2s',
+            price : 1449,
+            amount : 2
+          }
+        ]
+      },
+      methods : {
+        removeRow : function (n) {
+          if (n === -1) {
+            this.arr = [];
+          } else {
+            this.arr.splice(n, 1);
+          }
+        },
+        add : function (n) {
+          this.arr[n].amount ++;
+          this.count ();
+        },
+        subStr : function (n) {
+          if (this.arr[n].amount < 1) {
+            if (confirm('您确定要删除此商品吗？')) {
+              this.arr.splice (n, 1);
+            } else return;
+          }
+          this.arr[n].amount --;
+          this.count ();
+        },
+        count : function () {
+          var totalPrice = 0;
+          this.arr.forEach(function (val, index) {
+            totalPrice += val.price * val.amount;
+          });
+          this.total = parseFloat(totalPrice);
+        }
+      },
+      created : function () {
+        this.count ();
+      }
+    });
+  </script>
+</body>
+</html>
